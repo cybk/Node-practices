@@ -89,3 +89,13 @@ exports.resize = async (req, res, next) => {
     next();
 
 }
+
+exports.getStoreBySlug = async (req, res, next) => {
+    const store = await Store.findOne({slug: req.params.slug});
+    if(!store){
+        next();
+        return;
+    }
+
+    res.render('store', { titel: store.name, store});
+}
