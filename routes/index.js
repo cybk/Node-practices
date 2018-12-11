@@ -9,7 +9,7 @@ const { catchErrors } = require('../handlers/errorHandlers');
 router.get('/', catchErrors(storeController.getStores));
 // Routing for stores
 router.get('/stores', catchErrors(storeController.getStores));
-router.get('/add', storeController.addStore);
+router.get('/add', authController.isLoggedIn, storeController.addStore);
 router.get('/stores/:id/edit', catchErrors(storeController.editStore));
 router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
 
@@ -26,6 +26,7 @@ router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
 
 //routing for users
 router.get('/login', userController.loginForm);
+router.post('/login', authController.login);
 router.get('/register', userController.registerForm);
 
 // 1 validate registration data
@@ -35,5 +36,7 @@ router.post('/register',
         userController.validateRegister,
         catchErrors(userController.register),
         authController.login);
+
+router.get('/logout', authController.logout);
 
 module.exports = router;
