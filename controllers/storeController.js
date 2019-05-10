@@ -32,6 +32,7 @@ exports.addStore = (req, res) => {
 };
 
 exports.createStore =  async (req, res) => {
+    req.body.author = req.updateStore._id;
     const store = await (new Store(req.body)).save();
     req.flash('success', `Successfully created ${store.name}. Care to leave a review?`)
     res.redirect(`/store/${store.slug}`);
@@ -44,10 +45,17 @@ exports.getStores = async (req, res) => {
     res.render('stores', { title: 'Stores', stores });
 }
 
+const confirmOwner = (store, user) => {
+    if (!store.author || !store.author.equals(user._id)){
+        throw Error('You must own a store in order to edit it!');
+    }
+}
+
 exports.editStore = async (req, res) => {
     // find store by ID
     const store = await Store.findOne({_id: req.params.id});
     // confirm they are owner of store
+    confirmOwner(store, req.user);
     //Todo
     // render out the edit form
     res.render('editStore', {title: `Edit ${store.name}`, store});
@@ -91,7 +99,7 @@ exports.resize = async (req, res, next) => {
 }
 
 exports.getStoreBySlug = async (req, res, next) => {
-    const store = await Store.findOne({slug: req.params.slug});
+    const store = await Store.findOne({slug: req.params.slug}).populate('author');
     if(!store){
         next();
         return;
