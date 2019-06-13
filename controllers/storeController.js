@@ -119,6 +119,7 @@ exports.getStoresByTag = async(req, res) => {
 }
 
 exports.searchStores = async (req, res) => {
+    console.log(req.query);
     const stores = await Store.find({
         $text: {
             $search: req.query.q
@@ -134,4 +135,23 @@ exports.searchStores = async (req, res) => {
     .limit(5);
     // limit only return 5 items
     res.json(stores);
+}
+
+exports.mapStores = async(req, res) => {
+     const coordinates = [req.query.lng, req.query.lat].map(parseFloat);
+     const q = {
+             location: {
+                 $near: {
+                     $geometry: {
+                         type: 'Point',
+                         coordinates
+                     },
+                
+                     $maxDistance: 10000
+                 }
+             }
+     }
+     
+     const stores = await Store.find(q).select('slug name description location');
+     res.json(stores);
 }

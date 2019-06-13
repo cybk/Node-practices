@@ -14,7 +14,7 @@ const userSchema = new Schema({
         lowercase: true,
         trim: true,
         validate: [validator.isEmail, 'Invalid Email Address'],
-        required: 'Please, supply an email addres'
+        required: 'Please, supply an email address'
     },
     name: {
         type: String,
